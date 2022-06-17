@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const URI = process.env.MONGOOSE_URI
-    ? process.env.MONGOOSE_URI
+const URI = process.env.MONGOOSE_URL
+    ? process.env.MONGOOSE_URL
     : 'mongodb://localhost/escuelita';
 
 mongoose.connect(URI, {
