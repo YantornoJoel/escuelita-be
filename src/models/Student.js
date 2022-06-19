@@ -11,9 +11,18 @@ const studentSchema = new Schema({
     actividad: {
         type: String,
         enum: {
-            values: ['futbol', 'hockey', 'folklore', 'futsal', 'volley', 'patin'],
+            values: [
+                'futbol inf masc', 'futbol inf fem',
+                'defensa personal',
+                'folklore',
+                'futsal fem', 'futsal masc',
+                'volley',
+                'patin',
+                'zumba',
+                'espacio de recreacion don orione'
+            ],
             message: '{VALUE} no es un rol válido',
-            default: 'futbol',
+            default: 'patin',
             required: true
         }
     }
