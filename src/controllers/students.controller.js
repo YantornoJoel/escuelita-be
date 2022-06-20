@@ -1,7 +1,53 @@
 const studentsCtrl = {};
 const Students = require('../models/Student');
 
+const XLSX = require('xlsx')
 
+const leerExcel = (ruta) => {
+    const excel = XLSX.readFile(ruta)
+    const excelHojas = excel.SheetNames
+    const hoja = excelHojas[0]
+    const dataExcel = XLSX.utils.sheet_to_json(excel.Sheets[hoja])
+
+    return dataExcel
+}
+
+studentsCtrl.createStudentByExcel = async (req, res) => {
+    try {
+
+        const prueba = leerExcel('Usuarios.xlsx')
+
+        for (let index = 0; index < prueba.length; index++) {
+            const element = prueba[index];
+            const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = element
+            const newStudent = new Students({
+                nombre,
+                apellido,
+                dni,
+                actividad,
+                fechaNacimiento,
+                nsocio,
+                telefono,
+                antecedentesSalud
+            });
+
+            try {
+                await newStudent.save();
+                res.status(200).json('Alumnos subidos')
+
+            } catch (error) {
+                console.log(error)
+                res.status(400).json({ message: 'Error al subir alumnos' })
+            }
+
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json("Error al enviar los datos")
+    }
+}
 
 studentsCtrl.getStudents = async (req, res) => {
     try {

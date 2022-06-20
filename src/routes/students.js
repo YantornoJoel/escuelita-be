@@ -7,7 +7,8 @@ const { getStudents,
     deleteStudent,
     updateStudent,
     findStudentByUsername,
-    findStudentByActividad
+    findStudentByActividad,
+    createStudentByExcel
 } = require('../controllers/students.controller');
 
 router.route('/')
@@ -24,5 +25,8 @@ router.route('/find')
 
 router.route('/find/actividad')
     .post(findStudentByActividad);
+
+router.route('/seed')
+    .post(createStudentByExcel);
 
 module.exports = router;
