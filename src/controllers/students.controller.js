@@ -73,14 +73,14 @@ studentsCtrl.getStudents = async (req, res) => {
 
 studentsCtrl.createStudent = async (req, res) => {
     if (localStorage.getItem('token')) {
-        const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = req.body;
+        const { nombre, apellido, dni, actividad, fechaNacimiento, telefono, antecedentesSalud } = req.body;
         const newStudent = new Students({
             nombre,
             apellido,
             dni,
             actividad,
             fechaNacimiento,
-            nsocio,
+            nsocio: 0,
             telefono,
             antecedentesSalud
         });
@@ -112,11 +112,11 @@ studentsCtrl.getStudent = async (req, res) => {
 
 
 studentsCtrl.updateStudent = async (req, res) => {
-    const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = req.body;
+    const { nombre, apellido, dni, actividad, fechaNacimiento, telefono, antecedentesSalud } = req.body;
 
     try {
         await Students.findOneAndUpdate({ _id: req.params.id }, {
-            nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud
+            nombre, apellido, dni, actividad, fechaNacimiento, nsocio: 0, telefono, antecedentesSalud
         });
         res.status(200).json({ message: "Alumno actualizado" })
 
@@ -131,6 +131,18 @@ studentsCtrl.deleteStudent = async (req, res) => {
     try {
         await Students.findByIdAndDelete(req.params.id);
         res.status(200).json("Alumno eliminado")
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: 'Error al eliminar el alumno' })
+    }
+}
+
+
+studentsCtrl.deleteTotalStudent = async (req, res) => {
+    try {
+        await Students.deleteMany({ nsocio: 0 })
+        res.status(200).json("Alumnos eliminados")
 
     } catch (error) {
         console.log(error)

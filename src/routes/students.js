@@ -8,12 +8,14 @@ const { getStudents,
     updateStudent,
     findStudentByUsername,
     findStudentByActividad,
-    createStudentByExcel
+    createStudentByExcel,
+    deleteTotalStudent
 } = require('../controllers/students.controller');
 
 router.route('/')
     .get(getStudents)
-    .post(createStudent);
+    .post(createStudent)
+    .delete(deleteTotalStudent)
 
 router.route('/:id')
     .get(getStudent)
