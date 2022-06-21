@@ -1,19 +1,32 @@
-const {Router} = require ('express');
-const router  = Router();
+const { Router } = require('express');
+const { check } = require('express-validator')
 
-const {getUsers, createUser, deleteUser} = require('../controllers/users.controller');
-
-
-router.route('/')
-    .get(getUsers)
-    .post(createUser);
-
-router.route('/:id')
-    .delete(deleteUser);
+// Controladores
+const { crearUsuario, login, renewToken } = require('../controllers/users.controller');
+const { validarCampos } = require('../middlewares/validar-campos');
+const { validarJWT } = require('../middlewares/validar-jwt');
 
 
 
+const router = Router();
+
+// Crear nuevos usuarios
+router.post('/new', [
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    check('password', 'El password es obligatorio').not().isEmpty(),
+    check('email', 'El email es obligatorio').isEmail(),
+    validarCampos
+], crearUsuario);
+
+// Login
+router.post('/login', [
+    check('email', 'El email es obligatorio').isEmail(),
+    check('password', 'El password es obligatorio').not().isEmpty(),
+    validarCampos
+], login);
+
+// Revalidar token
+router.get('/renew', validarJWT, renewToken);
 
 
-
-module.exports= router;
+module.exports = router;

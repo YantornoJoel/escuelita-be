@@ -3,6 +3,10 @@ const Students = require('../models/Student');
 
 const XLSX = require('xlsx')
 
+let LocalStorage = require('node-localstorage').LocalStorage,
+    localStorage = new LocalStorage('./scratch');
+
+
 const leerExcel = (ruta) => {
     const excel = XLSX.readFile(ruta)
     const excelHojas = excel.SheetNames
@@ -15,10 +19,10 @@ const leerExcel = (ruta) => {
 studentsCtrl.createStudentByExcel = async (req, res) => {
     try {
 
-        const prueba = leerExcel('Usuarios.xlsx')
+        const excel = leerExcel('Usuarios.xlsx')
 
-        for (let index = 0; index < prueba.length; index++) {
-            const element = prueba[index];
+        for (let index = 0; index < excel.length; index++) {
+            const element = excel[index];
             const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = element
             const newStudent = new Students({
                 nombre,
@@ -50,40 +54,48 @@ studentsCtrl.createStudentByExcel = async (req, res) => {
 }
 
 studentsCtrl.getStudents = async (req, res) => {
-    try {
-        const students = await Students.find();
-        const counter = await Students.count();
-        res.status(200).json({ students, counter });
+    if (localStorage.getItem('token')) {
+        try {
+            const students = await Students.find();
+            const counter = await Students.count();
+            res.status(200).json({ students, counter });
 
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ message: 'Error del servidor' })
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ message: 'Error del servidor' })
+        }
+    } else {
+        res.status(500).json({ message: "Debe estar autenticado" })
     }
+
 };
 
 
 studentsCtrl.createStudent = async (req, res) => {
-    const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = req.body;
-    const newStudent = new Students({
-        nombre,
-        apellido,
-        dni,
-        actividad,
-        fechaNacimiento,
-        nsocio,
-        telefono,
-        antecedentesSalud
-    });
+    if (localStorage.getItem('token')) {
+        const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = req.body;
+        const newStudent = new Students({
+            nombre,
+            apellido,
+            dni,
+            actividad,
+            fechaNacimiento,
+            nsocio,
+            telefono,
+            antecedentesSalud
+        });
 
-    try {
-        await newStudent.save();
-        res.status(200).json('Alumno creado')
+        try {
+            await newStudent.save();
+            res.status(200).json('Alumno creado')
 
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ message: 'Error al crear alumno' })
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ message: 'Error al crear alumno' })
+        }
+    } else {
+        res.status(500).json({ message: "Debe estar autenticado" })
     }
-
 };
 
 
