@@ -161,7 +161,18 @@ studentsCtrl.findStudentByUsername = async (req, res) => {
     }
 
     try {
-        const students = await Students.find({ $or: [{ apellido: q }, { nombre: q }, { actividad: q }] })
+        // const students = await Students.find({ $or: [{ apellido: q }, { nombre: q }, { actividad: q }] })
+        const students = await Students.find({ 'nombre': { $regex: new RegExp("^" + q, 'i') } })
+
+        if (students.length === 0) {
+            const students = await Students.find({ 'apellido': { $regex: new RegExp("^" + q, 'i') }, })
+
+            if (students.length === 0) {
+                const students = await Students.find({ 'actividad': { $regex: new RegExp("^" + q, 'i') } })
+                return res.status(200).json(students);
+            }
+            return res.status(200).json(students);
+        }
         return res.status(200).json(students);
 
     } catch (error) {
