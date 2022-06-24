@@ -6,8 +6,11 @@ const studentSchema = new Schema({
     dni: { type: Number, required: true },
     fechaNacimiento: { type: Number, required: true },
     nsocio: { type: Number, required: true },
+    edad: { type: Number, required: true },
     telefono: { type: Number, required: true },
+    telefono2: { type: Number },
     antecedentesSalud: { type: String, required: true },
+    direccion: { type: String, required: true },
     actividad: {
         type: String,
         enum: {

@@ -23,15 +23,29 @@ studentsCtrl.createStudentByExcel = async (req, res) => {
 
         for (let index = 0; index < excel.length; index++) {
             const element = excel[index];
-            const { nombre, apellido, dni, actividad, fechaNacimiento, nsocio, telefono, antecedentesSalud } = element
-            const newStudent = new Students({
-                nombre,
+            const { nombre,
                 apellido,
                 dni,
                 actividad,
                 fechaNacimiento,
                 nsocio,
                 telefono,
+                antecedentesSalud,
+                edad,
+                telefono2,
+                direccion } = element
+
+            const newStudent = new Students({
+                nombre,
+                apellido,
+                dni,
+                actividad,
+                fechaNacimiento,
+                edad,
+                nsocio,
+                telefono,
+                telefono2,
+                direccion,
                 antecedentesSalud
             });
 
@@ -73,15 +87,18 @@ studentsCtrl.getStudents = async (req, res) => {
 
 studentsCtrl.createStudent = async (req, res) => {
     if (localStorage.getItem('token')) {
-        const { nombre, apellido, dni, actividad, fechaNacimiento, telefono, antecedentesSalud } = req.body;
+        const { nombre, apellido, dni, edad, fechaNacimiento, telefono, telefono2, direccion, antecedentesSalud, actividad } = req.body;
         const newStudent = new Students({
             nombre,
             apellido,
             dni,
             actividad,
             fechaNacimiento,
+            edad,
             nsocio: 0,
             telefono,
+            telefono2: telefono2 ? telefono2 : '0',
+            direccion,
             antecedentesSalud
         });
 
@@ -112,11 +129,12 @@ studentsCtrl.getStudent = async (req, res) => {
 
 
 studentsCtrl.updateStudent = async (req, res) => {
-    const { nombre, apellido, dni, actividad, fechaNacimiento, telefono, antecedentesSalud } = req.body;
+    const { nombre, apellido, dni, edad, fechaNacimiento, telefono, telefono2, direccion, antecedentesSalud, actividad } = req.body;
 
     try {
         await Students.findOneAndUpdate({ _id: req.params.id }, {
-            nombre, apellido, dni, actividad, fechaNacimiento, nsocio: 0, telefono, antecedentesSalud
+            nombre, apellido, dni, edad, fechaNacimiento, telefono, telefono2, direccion, antecedentesSalud, actividad
+            // nombre, apellido, dni, actividad, fechaNacimiento, nsocio: 0, telefono, antecedentesSalud, edad, telefono2, direccion
         });
         res.status(200).json({ message: "Alumno actualizado" })
 
