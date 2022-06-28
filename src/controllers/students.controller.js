@@ -12,54 +12,39 @@ const leerExcel = (ruta) => {
     const excelHojas = excel.SheetNames
     const hoja = excelHojas[0]
     const dataExcel = XLSX.utils.sheet_to_json(excel.Sheets[hoja])
-
     return dataExcel
 }
 
 studentsCtrl.createStudentByExcel = async (req, res) => {
     try {
 
-        const excel = leerExcel('Usuarios.xlsx')
+        const excel = leerExcel('Usuarios-DefensaPersonal.xlsx')
 
-        for (let index = 0; index < excel.length; index++) {
-            const element = excel[index];
-            const { nombre,
-                apellido,
-                dni,
-                actividad,
-                fechaNacimiento,
-                nsocio,
-                telefono,
-                antecedentesSalud,
-                edad,
-                telefono2,
-                direccion } = element
-
+        const newStudents = excel.map((e) => {
             const newStudent = new Students({
-                nombre,
-                apellido,
-                dni,
-                actividad,
-                fechaNacimiento,
-                edad,
-                nsocio,
-                telefono,
-                telefono2,
-                direccion,
-                antecedentesSalud
-            });
+                nombre: e.nombre,
+                apellido: e.apellido,
+                dni: e.dni,
+                actividad: e.actividad,
+                fechaNacimiento: e.fechaNacimiento,
+                edad: e.edad,
+                nsocio: 0,
+                telefono: e.telefono,
+                telefono2: e.telefono2 ? e.telefono2 : '0',
+                direccion: e.direccion,
+                antecedentesSalud: e.antecedentesSalud
+            })
+            newStudent.save();
+        })
 
-            try {
-                await newStudent.save();
-                res.status(200).json('Alumnos subidos')
+        try {
+            // await newStudents.save();
+            res.status(200).json('Alumnos subidos')
 
-            } catch (error) {
-                console.log(error)
-                res.status(400).json({ message: 'Error al subir alumnos' })
-            }
-
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ message: 'Error al subir alumnos' })
         }
-
 
     } catch (error) {
         console.log(error)
@@ -181,17 +166,22 @@ studentsCtrl.findStudentByUsername = async (req, res) => {
     try {
         // const students = await Students.find({ $or: [{ apellido: q }, { nombre: q }, { actividad: q }] })
         const students = await Students.find({ 'nombre': { $regex: new RegExp("^" + q, 'i') } })
+        const counter = students.length;
 
         if (students.length === 0) {
             const students = await Students.find({ 'apellido': { $regex: new RegExp("^" + q, 'i') }, })
+            const counter = students.length;
 
             if (students.length === 0) {
                 const students = await Students.find({ 'actividad': { $regex: new RegExp("^" + q, 'i') } })
-                return res.status(200).json(students);
+                const counter = students.length;
+                return res.status(200).json({ students, counter });
             }
-            return res.status(200).json(students);
+
+            return res.status(200).json({ students, counter });
+
         }
-        return res.status(200).json(students);
+        return res.status(200).json({ students, counter });
 
     } catch (error) {
         console.log(error)
